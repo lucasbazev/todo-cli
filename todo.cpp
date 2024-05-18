@@ -15,7 +15,7 @@ struct Task {
 };
 
 bool validateCommand(string command) {
-  string validCommands[] = {"add", "remove", "done", "undone", "list", "help", "end"};
+  string validCommands[] = {"add", "remove", "done", "undone", "list", "clear", "help", "end"};
 
   for (string validCommand : validCommands) {
     if (command == validCommand) {
@@ -32,7 +32,8 @@ int main() {
     "'remove <task_id>'  -> removes task from list",
     "'done <task_id>'    -> marks task as done",
     "'undone <task_id>   -> marks task as undone",
-    "'list'              -> show all items from list",
+    "'list'              -> shows all items from list",
+    "'clear'             -> removes all items from list",
     "'help'              -> lists available commands",
     "'end'               -> exits program",   
   };
@@ -56,8 +57,8 @@ int main() {
     }
 
     if (currIndex == 0) {
-      if (command == "remove" || command == "done" || command == "undone") {
-        cout << ANSI_YELLOW << "Cannot remove or mark as done/undone since your list is empty.\nTry adding a new task." << endl;
+      if (command == "remove" || command == "done" || command == "undone" || command == "clear") {
+        cout << ANSI_YELLOW << "Cannot remove/clear or mark as done/undone since your list is empty.\nTry adding a new task." << endl;
         continue;
       }
     }
@@ -152,10 +153,27 @@ int main() {
       }
     }
 
+    if (command == "clear") {
+      char confirm;
+      cout << ANSI_YELLOW << "You're removing all items from your list. Confirm (y/n)? ";
+      cin >> confirm;
+      cin.ignore();
+
+      if (confirm == 'n') continue;
+
+      Task empty;
+      empty.name = "";
+      empty.id = 0;
+      todos[0] = empty;
+      currIndex = 0;
+
+      cout << ANSI_RED << "Your list has been cleared." << endl;
+    }
+
     if (command == "help") {
       cout << endl << "Available commands:" << endl;
       
-      for (int i = 0; i < 7; i++) {
+      for (int i = 0; i < (sizeof(commands) / sizeof(commands[0])); i++) {
         cout << commands[i] << endl;
       }
 
