@@ -113,6 +113,13 @@ int main() {
 
       for (int i = 0; i < currIndex; i++) {
         if (todos[i].id == taskId) {
+          char confirm;
+          printf("%sYou're removing '%i. %s' from the list. Confirm (y/n)? ", ANSI_YELLOW, todos[i].id, todos[i].name.c_str());
+          cin >> confirm;
+          cin.ignore();
+
+          if (confirm == 'n') break;
+
           cout << ANSI_RED << endl;
           printf("Task '%i. %s' removed from list.\n", todos[i].id, todos[i].name.c_str());
           
