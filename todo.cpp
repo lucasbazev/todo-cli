@@ -16,16 +16,14 @@ struct Task {
 
 bool validateCommand(string command) {
   string validCommands[] = {"add", "remove", "done", "undone", "list", "help", "end"};
-  bool valid = false;
 
   for (string validCommand : validCommands) {
     if (command == validCommand) {
-      valid = true;
-      return valid;
+      return true;
     }
   }
 
-  return valid;
+  return false;
 }
 
 int main() {
@@ -34,7 +32,7 @@ int main() {
     "'remove <task_id>'  -> removes task from list",
     "'done <task_id>'    -> marks task as done",
     "'undone <task_id>   -> marks task as undone",
-    "'list'              -> prints current state of list",
+    "'list'              -> show all items from list",
     "'help'              -> lists available commands",
     "'end'               -> exits program",   
   };
