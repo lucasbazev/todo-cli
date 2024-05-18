@@ -40,8 +40,9 @@ int main() {
   Task todos[20];
   int taskId, currIndex = 0;
 
-  cout << ANSI_BLUE << "TODO CLI" << endl;
+  cout << ANSI_BLUE << "Welcome to TODO CLI - Developed by Lucas Azevedo" << endl;
   cout << ANSI_RESET << "Enter 'help' for list of available commands.\n\n";
+
   string command;
   Task task;
 
@@ -96,7 +97,7 @@ int main() {
       
       for (int i = 0; i < currIndex; i++) {
         if (todos[i].id == taskId) {
-          todos[i].done = true;
+          todos[i].done = false;
 
           cout << ANSI_YELLOW;
           printf("Task '%i, %s' marked as undone.\n", todos[i].id, todos[i].name.c_str());
@@ -172,7 +173,7 @@ int main() {
     }
   }
 
-  cout << endl << ANSI_RED << "Program exited.";
+  cout << endl << ANSI_RED << "Program exited." << endl;
 
 	return 0;
 }
