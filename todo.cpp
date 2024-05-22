@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <sqlite3.h>
+
 using namespace std;
 
 #define ANSI_GREEN   "\x1b[32m"
@@ -38,12 +40,33 @@ int main() {
     "'end'               -> exits program",   
   };
 
-  Task todos[20];
-  int taskId, currIndex = 0;
-
   cout << ANSI_BLUE << "Welcome to TODO CLI - Developed by Lucas Azevedo" << endl;
   cout << ANSI_RESET << "Enter 'help' for list of available commands.\n\n";
+  
+  // init/connect to database
+  sqlite3 *ppDb;
+  char *errMsg = 0;
+  char *sql;
 
+  int response = sqlite3_open("todo_database", &ppDb);
+
+  sql = "CREATE TABLE todos("
+          "task_name TEXT NOT NULL,"
+          "done INT NOT NULL CHECK(done IN(0, 1))"
+        ");";
+
+  response = sqlite3_exec(ppDb, sql, nullptr, nullptr, &errMsg);
+
+  sql = "INSERT INTO todos VALUES"
+    "('sqlite3', 0),"
+    "('test', 0),"
+    "('testing', 1),"
+    "('in c++', 1);";
+
+  response = sqlite3_exec(ppDb, sql, nullptr, nullptr, &errMsg);
+
+  Task todos[20];
+  int taskId, currIndex = 0;
   string command;
   Task task;
 
