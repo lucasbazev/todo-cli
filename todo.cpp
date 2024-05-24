@@ -43,27 +43,17 @@ int main() {
   cout << ANSI_BLUE << "Welcome to TODO CLI - Developed by Lucas Azevedo" << endl;
   cout << ANSI_RESET << "Enter 'help' for list of available commands.\n\n";
   
-  // init/connect to database
-  sqlite3 *ppDb;
-  char *errMsg = 0;
-  char *sql;
+  // init/connect to database and init vars
+  sqlite3 *db;
+  char *sqliteErrMsg;
+  string sql;
+  int sqliteResponseCode;
 
-  int response = sqlite3_open("todo_database", &ppDb);
+  if (sqlite3_open("todo_database", &db)) {
+    cerr << sqlite3_errmsg(db);
+    sqlite3_close(db);
+  }
 
-  sql = "CREATE TABLE todos("
-          "task_name TEXT NOT NULL,"
-          "done INT NOT NULL CHECK(done IN(0, 1))"
-        ");";
-
-  response = sqlite3_exec(ppDb, sql, nullptr, nullptr, &errMsg);
-
-  sql = "INSERT INTO todos VALUES"
-    "('sqlite3', 0),"
-    "('test', 0),"
-    "('testing', 1),"
-    "('in c++', 1);";
-
-  response = sqlite3_exec(ppDb, sql, nullptr, nullptr, &errMsg);
 
   Task todos[20];
   int taskId, currIndex = 0;
@@ -102,7 +92,6 @@ int main() {
       cin >> taskId;
       cin.ignore();
 
-      // could simply do todos[taskId - 1].done = true, but I want to implement a real search algorithm
       for (int i = 0; i < currIndex; i++) {
         if (todos[i].id == taskId) {
           todos[i].done = true;
@@ -205,12 +194,49 @@ int main() {
 
     if (command == "end") {
       char confirm;
-      cout << ANSI_YELLOW << "You're going to lose your list. Confirm (y/n)? ";
+      cout << ANSI_YELLOW << "You're ending this program. Confirm (y/n)? ";
       cin >> confirm;
       cin.ignore();
 
-      if (confirm == 'y') continue;
-      else command = "";
+      if (confirm == 'y') {
+        if (currIndex != 0) {
+          cout << endl << "Do you want to save this list into the database?\nThis action will override the previously saved list. (y/n): ";
+          cin >> confirm;
+          cin.ignore();
+
+          if (confirm == 'y') {
+            sqliteResponseCode = sqlite3_exec(db, "drop table if exists todos;", 0, 0, &sqliteErrMsg);
+
+            if (sqliteResponseCode != SQLITE_OK) {
+              cerr << ANSI_RED << "Failed to save to database.";
+              sqlite3_close(db);
+              continue;
+            }
+
+            sqliteResponseCode = sqlite3_exec(db, "create table todos(task_name text not null unique, done int);", 0, 0, &sqliteErrMsg);
+
+            if (sqliteResponseCode != SQLITE_OK) {
+              cerr << ANSI_RED << "Failed to save to database.";
+              sqlite3_close(db);
+              continue;
+            }
+
+            for (int i = 0; i < currIndex; i++) {
+              sql = "insert into todos values ('" + todos[i].name + "'," + to_string(todos[i].done ? 1 : 0) + ");";
+              sqliteResponseCode = sqlite3_exec(db, sql.c_str(), 0, 0, &sqliteErrMsg);
+            
+              if (sqliteResponseCode != SQLITE_OK) {
+                cerr << ANSI_RED << "Failed to save to database.";
+                break;
+              }
+            }
+
+            cout << ANSI_GREEN << "List successfully saved to database" << endl;
+          } else continue;
+        }
+
+        sqlite3_close(db);
+      } else command = "";
     }
   }
 

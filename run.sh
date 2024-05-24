@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Try to compile with clang++
-clang++ todo.cpp -o todo_executable - lsqlite3
+clang++ todo.cpp -o todo_executable -lsqlite3 -w
 
 # If clang++ fails, try to compile with g++
 if [ $? -ne 0 ]; then
 	echo "clang++ failed, trying g++..."
-	g++ todo.cpp -o todo_executable -lsqlite3
+	g++ todo.cpp -o todo_executable -lsqlite3 -w
 
 	# Check if g++ succeeded
 	if [ $? -ne 0 ]; then
