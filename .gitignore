@@ -1,3 +1,4 @@
 todo_executable
 todo_database
 *.swp
+.DS_Store
