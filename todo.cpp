@@ -1,14 +1,14 @@
 #include <iostream>
-#include <string>
 #include <sqlite3.h>
+#include <string>
 
 using namespace std;
 
-#define ANSI_GREEN   "\x1b[32m"
-#define ANSI_BLUE    "\x1b[34m"
-#define ANSI_RED     "\x1b[31m"
-#define ANSI_YELLOW  "\x1b[33m"
-#define ANSI_RESET   "\x1b[0m"
+#define ANSI_GREEN "\x1b[32m"
+#define ANSI_BLUE "\x1b[34m"
+#define ANSI_RED "\x1b[31m"
+#define ANSI_YELLOW "\x1b[33m"
+#define ANSI_RESET "\x1b[0m"
 
 struct Task {
   int id;
@@ -30,19 +30,19 @@ bool validateCommand(string command) {
 
 int main() {
   string commands[] = {
-    "'add <task_name>'   -> adds task to list",
-    "'remove <task_id>'  -> removes task from list",
-    "'done <task_id>'    -> marks task as done",
-    "'undone <task_id>   -> marks task as undone",
-    "'list'              -> shows all items from list",
-    "'clear'             -> removes all items from list",
-    "'help'              -> lists available commands",
-    "'end'               -> exits program",   
+      "'add <task_name>'   -> adds task to list",
+      "'remove <task_id>'  -> removes task from list",
+      "'done <task_id>'    -> marks task as done",
+      "'undone <task_id>   -> marks task as undone",
+      "'list'              -> shows all items from list",
+      "'clear'             -> removes all items from list",
+      "'help'              -> lists available commands",
+      "'end'               -> exits program",
   };
 
   cout << ANSI_BLUE << "Welcome to TODO CLI - Developed by Lucas Azevedo" << endl;
   cout << ANSI_RESET << "Enter 'help' for list of available commands.\n\n";
-  
+
   // init/connect to database and init vars
   sqlite3 *db;
   char *sqliteErrMsg;
@@ -54,14 +54,14 @@ int main() {
     sqlite3_close(db);
   }
 
-
   Task todos[20];
   int taskId, currIndex = 0;
   string command;
   Task task;
 
   while (command != "end") {
-    cout << ANSI_RESET << endl << "Enter a command: ";
+    cout << ANSI_RESET << endl
+         << "Enter a command: ";
     getline(cin, command);
 
     if (!validateCommand(command)) {
@@ -83,7 +83,7 @@ int main() {
       task.id = currIndex + 1;
       todos[currIndex] = task;
       currIndex++;
-      
+
       printf("%s'%s' added to your list.\n", ANSI_BLUE, task.name.c_str());
     }
 
@@ -107,7 +107,7 @@ int main() {
       cout << "Enter task id: ";
       cin >> taskId;
       cin.ignore();
-      
+
       for (int i = 0; i < currIndex; i++) {
         if (todos[i].id == taskId) {
           todos[i].done = false;
@@ -130,11 +130,12 @@ int main() {
           cin >> confirm;
           cin.ignore();
 
-          if (confirm == 'n') break;
+          if (confirm == 'n')
+            break;
 
           cout << ANSI_RED << endl;
           printf("Task '%i. %s' removed from list.\n", todos[i].id, todos[i].name.c_str());
-          
+
           for (int j = i; j < currIndex; j++) {
             todos[j] = todos[j + 1];
             todos[j].id--;
@@ -148,9 +149,11 @@ int main() {
 
     if (command == "list") {
       if (currIndex == 0) {
-        cout << endl << "Your TODO list is empty..." << endl;
+        cout << endl
+             << "Your TODO list is empty..." << endl;
       } else {
-        cout << endl << "TODO: " << endl;
+        cout << endl
+             << "TODO: " << endl;
 
         for (int i = 0; i < currIndex; i++) {
           if (todos[i].done) {
@@ -160,7 +163,7 @@ int main() {
           }
 
           cout << ANSI_RESET;
-          printf("%i. %s\n", i + 1, todos[i].name.c_str()); 
+          printf("%i. %s\n", i + 1, todos[i].name.c_str());
         }
       }
     }
@@ -171,7 +174,8 @@ int main() {
       cin >> confirm;
       cin.ignore();
 
-      if (confirm == 'n') continue;
+      if (confirm == 'n')
+        continue;
 
       Task empty;
       empty.name = "";
@@ -183,8 +187,9 @@ int main() {
     }
 
     if (command == "help") {
-      cout << endl << "Available commands:" << endl;
-      
+      cout << endl
+           << "Available commands:" << endl;
+
       for (int i = 0; i < (sizeof(commands) / sizeof(commands[0])); i++) {
         cout << commands[i] << endl;
       }
@@ -200,7 +205,8 @@ int main() {
 
       if (confirm == 'y') {
         if (currIndex != 0) {
-          cout << endl << "Do you want to save this list into the database?\nThis action will override the previously saved list. (y/n): ";
+          cout << endl
+               << "Do you want to save this list into the database?\nThis action will override the previously saved list. (y/n): ";
           cin >> confirm;
           cin.ignore();
 
@@ -224,7 +230,7 @@ int main() {
             for (int i = 0; i < currIndex; i++) {
               sql = "insert into todos values ('" + todos[i].name + "'," + to_string(todos[i].done ? 1 : 0) + ");";
               sqliteResponseCode = sqlite3_exec(db, sql.c_str(), 0, 0, &sqliteErrMsg);
-            
+
               if (sqliteResponseCode != SQLITE_OK) {
                 cerr << ANSI_RED << "Failed to save to database.";
                 break;
@@ -232,15 +238,18 @@ int main() {
             }
 
             cout << ANSI_GREEN << "List successfully saved to database" << endl;
-          } else continue;
+          } else
+            continue;
         }
 
         sqlite3_close(db);
-      } else command = "";
+      } else
+        command = "";
     }
   }
 
-  cout << endl << ANSI_RED << "Program exited." << endl;
+  cout << endl
+       << ANSI_RED << "Program exited." << endl;
 
-	return 0;
+  return 0;
 }
