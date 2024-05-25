@@ -28,6 +28,24 @@ bool validateCommand(string command) {
   return false;
 }
 
+int loadPreviousList(void *data, int columns, char **rowValues, char **azColName) {
+  Task task;
+  Task *previousList = static_cast<Task *>(data);
+
+  for (int i = 0; i < columns; i++) {
+    if (string(azColName[i]) == "done") {
+      task.done = (bool)(*rowValues[i] - '0');
+    } else if (string(azColName[i]) == "task_name") {
+      task.name = rowValues[i];
+    } else if (string(azColName[i]) == "rowid") {
+      task.id = *rowValues[i] - '0';
+    }
+  }
+
+  previousList[task.id - 1] = task;
+  return 0;
+}
+
 int main() {
   string commands[] = {
       "'add <task_name>'   -> adds task to list",
@@ -40,7 +58,7 @@ int main() {
       "'end'               -> exits program",
   };
 
-  cout << ANSI_BLUE << "Welcome to TODO CLI - Developed by Lucas Azevedo" << endl;
+  cout << ANSI_BLUE << "\n\nWelcome to TODO CLI - Developed by Lucas Azevedo" << endl;
   cout << ANSI_RESET << "Enter 'help' for list of available commands.\n\n";
 
   // init/connect to database and init vars
@@ -54,8 +72,50 @@ int main() {
     sqlite3_close(db);
   }
 
-  Task todos[20];
-  int taskId, currIndex = 0;
+  // check if there are any previously saved list in the database
+  Task previousList[20], todos[20];
+  int currIndex = 0;
+
+  sqliteResponseCode = sqlite3_exec(db, "select rowid, * from todos;", loadPreviousList, &previousList, &sqliteErrMsg);
+
+  if (sqliteResponseCode) {
+    cout << ANSI_YELLOW << "You do not have a previously saved list.";
+  } else if (previousList[0].id) {
+    char confirm;
+    cout << ANSI_YELLOW << "You have a previously saved list in the database:\n\n";
+
+    for (Task item : previousList) {
+      if (!item.id)
+        break;
+
+      if (item.done) {
+        cout << ANSI_GREEN;
+        printf("%i. [DONE] %s\n", item.id, item.name.c_str());
+        continue;
+      }
+
+      cout << ANSI_RESET;
+      printf("%i. %s\n", item.id, item.name.c_str());
+    }
+
+    cout << ANSI_YELLOW << "\nDo you want to retrieve it (y/n)? ";
+    cin >> confirm;
+    cin.ignore();
+
+    if (confirm == 'y') {
+      for (int i = 0; i < 20; i++) {
+        if (!previousList[i].id)
+          break;
+
+        todos[i] = previousList[i];
+        currIndex++;
+      }
+
+      cout << ANSI_GREEN << "Your list has been succesfully retrieved!" << endl;
+    }
+  }
+
+  int taskId;
   string command;
   Task task;
 
@@ -237,7 +297,7 @@ int main() {
               }
             }
 
-            cout << ANSI_GREEN << "List successfully saved to database" << endl;
+            cout << ANSI_GREEN << "List successfully saved to database." << endl;
           } else
             continue;
         }
