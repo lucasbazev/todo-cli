@@ -19,10 +19,12 @@ The current version of the app includes the following basic functions:
 - Removing tasks
 - Clearing list
 - Listing the current state of all tasks
+- Saving the current list in the database (as of today, users can save only one active list).
+- Retrieving the previously stored list from the database.
 
 ### Future Plans
 
-While the app currently doesn't store the data in a database, I plan to implement database storage in future versions. This will allow for more robust data management and persistence.
+I’m hoping to find time to revisit this project, improve its usefulness, and have some fun, while occasionally regretting my decision to build it in C++.
 
 ### Requirements
 
