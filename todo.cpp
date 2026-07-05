@@ -1,3 +1,4 @@
+#include <exception>
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
@@ -60,6 +61,14 @@ int main() {
 
   cout << ANSI_BLUE << "\n\nWelcome to TODO CLI - Developed by Lucas Azevedo" << endl;
   cout << ANSI_RESET << "Enter 'help' for list of available commands.\n\n";
+
+  try {
+    if (true) {
+      throw std::exception();
+    }
+  } catch (std::exception &e) {
+    cout << ANSI_RED << "Exception caught: " << e.what() << endl;
+  }
 
   // init/connect to database and init vars
   sqlite3 *db;
