@@ -1,4 +1,5 @@
-todo_executable
-todo_database
+app
+todo_database*
 *.swp
 .DS_Store
+.aider*

@@ -1,3 +1,8 @@
+/*
+ * This file is the original implementation from the legacy phase.
+ * It is kept here for archival purposes and is not part of the current build.
+ */
+
 #include <exception>
 #include <iostream>
 #include <sqlite3.h>

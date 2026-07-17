@@ -1,13 +1,9 @@
-app: todo.cpp
-	clang++ todo.cpp -o todo_executable -lsqlite3 -w; \
-	if [ $$? -ne 0 ]; then \
-		echo "clang++ failed, trying g++..."; \
-		g++ todo.cpp -o todo_executable -lsqlite3 -w; \
-		if [ $$? -ne 0 ]; then \
-			echo "Both clang++ and g++ failed to compile todo.cpp"; \
-			exit 1; \
-		fi; \
-	fi
+CXXFLAGS += -Isrc
 
-run:
-	./todo_executable
+app: src/main.cpp src/domain/*.cpp src/storage/*.cpp src/cli/*.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@ -lsqlite3
+
+run: app
+	./app
+
+.PHONY: run app
